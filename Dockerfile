@@ -12,6 +12,9 @@ COPY ./files/sources.list.jessie /etc/apt/sources.list
 ## Update Ubuntu
 RUN apt-get update
 
+## VIM
+RUN apt-get install -y vim
+
 ## mcrypt
 RUN apt-get install -y libmcrypt-dev
 RUN docker-php-ext-install mcrypt
@@ -138,9 +141,9 @@ RUN docker-php-ext-install bz2
 ## Please turn on proxy (the proxy IP may be docker host IP or others).
 #RUN export http_proxy=10.0.75.1:1080
 #RUN export https_proxy=10.0.75.1:1080
-#RUN pecl install redis-3.1.4 && docker-php-ext-enable redis
-#RUN pecl install xdebug && docker-php-ext-enable xdebug
-#RUN pecl install igbinary && docker-php-ext-enable igbinary
+RUN pecl install redis-3.1.4 && docker-php-ext-enable redis
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install igbinary && docker-php-ext-enable igbinary
 #RUN apt-get install -y libmagickwand-dev && pecl install imagick && docker-php-ext-enable imagick
 #RUN apt-get install -y libmemcached-dev zlib1g-dev && pecl install memcached && docker-php-ext-enable memcached
 

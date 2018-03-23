@@ -1,6 +1,6 @@
 FROM php:7.1-fpm
 
-COPY ./sources.list.stretch /etc/apt/sources.list
+COPY ./sources.list.jessie /etc/apt/sources.list
 
 # Extensions: ctype, dom, fileinfo, ftp, hash, iconv, json, pdo, pdo_sqlite, session,
 # tokenizer, simplexml, xml, xmlreader, xmlwriter and phar are bundled and compiled into
@@ -12,6 +12,7 @@ COPY ./sources.list.stretch /etc/apt/sources.list
 # 3. soap requires libxml2-dev.
 # 4. xml, xmlrpc, wddx require libxml2-dev and libxslt-dev.
 # 5. Line `&& :\` is just for better reading and do nothing.
+RUN echo "hello world"
 RUN apt-get update \
     && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
@@ -109,16 +110,48 @@ RUN apt-get update \
 # Please turn on proxy (The proxy IP may be docker host IP or others):
 #RUN pear config-set http_proxy http://10.0.75.1:1080
 
-RUN pecl install redis-3.1.4 \
-    && docker-php-ext-enable redis \
-    && :\
-    && pecl install xdebug-2.6.0alpha1 \
-    && docker-php-ext-enable xdebug \
-    && :\
-    && apt-get install -y libmagickwand-dev \
-    && pecl install imagick-3.4.3 \
-    && docker-php-ext-enable imagick \
-    && :\
-    && apt-get install -y libmemcached-dev zlib1g-dev \
-    && pecl install memcached-3.0.4 \
-    && docker-php-ext-enable memcached
+#RUN pecl install redis-3.1.4 \
+#    && docker-php-ext-enable redis \
+#    && :\
+#    && pecl install xdebug-2.6.0alpha1 \
+#    && docker-php-ext-enable xdebug \
+#    && :\
+#    && apt-get install -y libmagickwand-dev \
+#    && pecl install imagick-3.4.3 \
+#    && docker-php-ext-enable imagick \
+#    && :\
+#    && apt-get install -y libmemcached-dev zlib1g-dev \
+#    && pecl install memcached-3.0.4 \
+#    && docker-php-ext-enable memcached
+
+# -------------不能使用pecl则使用以下方安装----------------
+
+# redis
+RUN mkdir /usr/local/redis
+COPY ./redis-3.1.4.tgz /usr/local/redis/ 
+# 设置docker容器工作目录
+WORKDIR "/usr/local/redis/" 
+RUN tar zxvf /usr/local/redis/redis-3.1.4.tgz
+WORKDIR /usr/local/redis/redis-3.1.4
+RUN /usr/local/bin/phpize && ./configure --with-php-config=/usr/local/bin/php-config && make && make install
+RUN docker-php-ext-enable redis
+
+# 安装xdebug
+RUN mkdir /usr/local/xdebug
+COPY ./xdebug-2.6.0.tgz /usr/local/xdebug
+WORKDIR "/usr/local/xdebug"
+RUN tar zxvf xdebug-2.6.0.tgz
+WORKDIR /usr/local/xdebug/xdebug-2.6.0
+RUN /usr/local/bin/phpize && ./configure --enable-xdebug --with-php-config=/usr/local/bin/php-config && make && make install
+RUN docker-php-ext-enable xdebug
+
+# 安装swoole
+RUN mkdir /usr/local/swoole
+COPY ./swoole-src /usr/local/swoole
+WORKDIR /usr/local/swoole
+RUN /usr/local/bin/phpize && \
+    ./configure && \
+    make && make install
+RUN docker-php-ext-enable swoole
+
+WORKDIR /var/www/html

@@ -1,2 +1,8 @@
-.*
-!.gitignore
+conf/nginx/conf.d/*
+!conf/nginx/conf.d/site1.conf
+!conf/nginx/conf.d/site2.conf
+www/*
+.DS_Store
+log/.DS_Store
+conf/.DS_Store
+conf/php/.DS_Store
