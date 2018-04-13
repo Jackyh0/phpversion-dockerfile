@@ -13,8 +13,9 @@ nginx:
 
 php56:
   build: ./php/php56/
-  expose:
-    - "9000"
+  ports:
+    - "9000:9000"
+    - "22224:22"
   volumes:
     - ./www/:/var/www/html/:rw
     - ./conf/php/php.ini:/usr/local/etc/php/php.ini:ro

@@ -122,3 +122,5 @@ RUN pecl install redis-3.1.4 \
     && apt-get install -y libmemcached-dev zlib1g-dev \
     && pecl install memcached-2.2.0 \
     && docker-php-ext-enable memcached
+
+RUN apt-get install -y vim ssh
